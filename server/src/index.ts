@@ -1,5 +1,5 @@
-import express, { Request, Response } from "express";
 import cors from "cors";
+import express, { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
 
 type Note = {
