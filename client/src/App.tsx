@@ -132,6 +132,18 @@ export default function App() {
   }
 };
 
+{editingId && (
+  <button
+    className="ghost"
+    onClick={() => {
+      setDraft(emptyDraft);
+      setEditingId(null);
+    }}
+  >
+    Cancel editing
+  </button>
+)}
+
 
   /* =======================
      Delete note
