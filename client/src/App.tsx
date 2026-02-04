@@ -106,6 +106,32 @@ export default function App() {
       setSaving(false);
     }
   };
+  const updateNote = async () => {
+  if (!editingId) return;
+  if (!draft.title.trim() && !draft.content.trim()) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/notes/${editingId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(draft),
+    });
+
+    if (!res.ok) throw new Error("Update failed");
+
+    const updated = (await res.json()) as Note;
+
+    setNotes((prev) =>
+      prev.map((note) => (note.id === updated.id ? updated : note))
+    );
+
+    setDraft(emptyDraft);
+    setEditingId(null);
+  } catch {
+    alert("Could not update note");
+  }
+};
+
 
   /* =======================
      Delete note
