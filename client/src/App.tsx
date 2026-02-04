@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 ======================= */
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+
 /* =======================
    Types
 ======================= */
@@ -54,6 +55,8 @@ async function deleteNoteApi(id: string): Promise<void> {
 export default function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
