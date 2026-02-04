@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:5000";
+/* =======================
+   Config
+======================= */
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+/* =======================
+   Types
+======================= */
 type Note = {
   id: string;
   title: string;
@@ -16,18 +22,61 @@ type Draft = {
 
 const emptyDraft: Draft = { title: "", content: "" };
 
+/* =======================
+   API helpers
+======================= */
+async function getNotes(): Promise<Note[]> {
+  const res = await fetch(`${API_BASE}/notes`);
+  if (!res.ok) throw new Error("Failed to load notes");
+  return res.json();
+}
+
+async function createNoteApi(draft: Draft): Promise<Note> {
+  const res = await fetch(`${API_BASE}/notes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(draft),
+  });
+  if (!res.ok) throw new Error("Failed to create note");
+  return res.json();
+}
+
+async function deleteNoteApi(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/notes/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete note");
+}
+
+/* =======================
+   Component
+======================= */
 export default function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /* =======================
+     Load notes
+  ======================= */
   useEffect(() => {
     const loadNotes = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const res = await fetch(`${API_BASE}/notes`);
-        const data = (await res.json()) as Note[];
+        const data = await getNotes();
+        // newest first
+        data.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+        );
         setNotes(data);
+      } catch (err) {
+        setError("Could not load notes. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -36,25 +85,45 @@ export default function App() {
     loadNotes();
   }, []);
 
+  /* =======================
+     Create note
+  ======================= */
   const createNote = async () => {
-    if (!draft.title.trim() && !draft.content.trim()) {
-      return;
+    if (!draft.title.trim() && !draft.content.trim()) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const created = await createNoteApi(draft);
+      setNotes((prev) => [created, ...prev]);
+      setDraft(emptyDraft);
+    } catch {
+      setError("Could not save note.");
+    } finally {
+      setSaving(false);
     }
-    const res = await fetch(`${API_BASE}/notes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(draft),
-    });
-    const created = (await res.json()) as Note;
-    setNotes((prev) => [created, ...prev]);
-    setDraft(emptyDraft);
   };
 
+  /* =======================
+     Delete note
+  ======================= */
   const deleteNote = async (id: string) => {
-    await fetch(`${API_BASE}/notes/${id}`, { method: "DELETE" });
-    setNotes((prev) => prev.filter((note) => note.id !== id));
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this note?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteNoteApi(id);
+      setNotes((prev) => prev.filter((note) => note.id !== id));
+    } catch {
+      setError("Could not delete note.");
+    }
   };
 
+  /* =======================
+     Render
+  ======================= */
   return (
     <div className="page">
       <header className="header">
@@ -62,34 +131,45 @@ export default function App() {
           <p className="eyebrow">Notes</p>
           <h1>Personal Notes</h1>
         </div>
-        <button className="primary" onClick={createNote}>
-          Save note
+
+        <button
+          className="primary"
+          onClick={createNote}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save note"}
         </button>
       </header>
 
       <section className="composer">
         <input
           value={draft.title}
-          onChange={(event) =>
-            setDraft((prev) => ({ ...prev, title: event.target.value }))
+          onChange={(e) =>
+            setDraft((prev) => ({ ...prev, title: e.target.value }))
           }
           placeholder="Title"
+          autoFocus
         />
+
         <textarea
           value={draft.content}
-          onChange={(event) =>
-            setDraft((prev) => ({ ...prev, content: event.target.value }))
+          onChange={(e) =>
+            setDraft((prev) => ({ ...prev, content: e.target.value }))
           }
           placeholder="Write something..."
           rows={5}
         />
       </section>
 
+      {error && <p className="error">{error}</p>}
+
       <section className="notes">
         {loading ? (
           <p className="muted">Loading notes...</p>
         ) : notes.length === 0 ? (
-          <p className="muted">No notes yet. Add your first note above.</p>
+          <p className="muted">
+            No notes yet. Add your first note above.
+          </p>
         ) : (
           <div className="grid">
             {notes.map((note) => (
@@ -98,8 +178,11 @@ export default function App() {
                   <h2>{note.title || "Untitled"}</h2>
                   <p>{note.content || "No content"}</p>
                 </div>
+
                 <footer>
-                  <span>{new Date(note.createdAt).toLocaleString()}</span>
+                  <span>
+                    {new Date(note.createdAt).toLocaleString()}
+                  </span>
                   <button
                     className="ghost"
                     onClick={() => deleteNote(note.id)}
