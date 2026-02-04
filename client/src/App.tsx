@@ -209,16 +209,31 @@ export default function App() {
                 </div>
 
                 <footer>
-                  <span>
-                    {new Date(note.createdAt).toLocaleString()}
-                  </span>
-                  <button
-                    className="ghost"
-                    onClick={() => deleteNote(note.id)}
-                  >
-                    Delete
-                  </button>
-                </footer>
+  <span>{new Date(note.createdAt).toLocaleString()}</span>
+
+  <div>
+    <button
+      className="ghost"
+      onClick={() => {
+        setDraft({
+          title: note.title,
+          content: note.content,
+        });
+        setEditingId(note.id);
+      }}
+    >
+      Edit
+    </button>
+
+    <button
+      className="ghost"
+      onClick={() => deleteNote(note.id)}
+    >
+      Delete
+    </button>
+  </div>
+</footer>
+
               </article>
             ))}
           </div>
