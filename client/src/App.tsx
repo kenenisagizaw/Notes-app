@@ -162,12 +162,12 @@ export default function App() {
         </div>
 
         <button
-          className="primary"
-          onClick={createNote}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : "Save note"}
-        </button>
+  className="primary"
+  onClick={editingId ? updateNote : createNote}
+>
+  {editingId ? "Update note" : "Save note"}
+</button>
+
       </header>
 
       <section className="composer">
