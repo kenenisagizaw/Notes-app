@@ -45,13 +45,39 @@ app.delete("/notes/:id", (req: Request, res: Response) => {
 });
 
 // UPDATE note
-app.put("/notes/:id", (req: Request, res: Response) => {
-  const updates = req.body as Partial<Pick<Note, "title" | "content">>;
-  notes = notes.map((note) =>
-    note.id === req.params.id ? { ...note, ...updates } : note
-  );
-  res.json({ message: "Updated" });
+app.put("/notes/:id", (req, res) => {
+  const { id } = req.params;
+  const { title, content } = req.body;
+
+  if (
+    (!title || !title.trim()) &&
+    (!content || !content.trim())
+  ) {
+    return res.status(400).json({
+      message: "Title or content is required",
+    });
+  }
+
+  const noteIndex = notes.findIndex((n) => n.id === id);
+
+  if (noteIndex === -1) {
+    return res.status(404).json({
+      message: "Note not found",
+    });
+  }
+
+  const updatedNote = {
+    ...notes[noteIndex],
+    title: title ?? notes[noteIndex].title,
+    content: content ?? notes[noteIndex].content,
+    updatedAt: new Date().toISOString(),
+  };
+
+  notes[noteIndex] = updatedNote;
+
+  res.status(200).json(updatedNote);
 });
+
 
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
