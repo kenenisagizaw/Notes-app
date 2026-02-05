@@ -18,7 +18,7 @@ export function NoteEditor({
   onCancel,
 }: Props) {
   return (
-    <section className="composer">
+    <section className="bg-white rounded-xl shadow p-4 mb-6 space-y-3">
       <input
         value={draft.title}
         onChange={(e) =>
@@ -26,8 +26,8 @@ export function NoteEditor({
         }
         placeholder="Title"
         autoFocus
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
       />
-
       <textarea
         value={draft.content}
         onChange={(e) =>
@@ -35,19 +35,21 @@ export function NoteEditor({
         }
         placeholder="Write something..."
         rows={5}
+        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
       />
-
-      <div>
-        <button className="primary" onClick={onSave} disabled={saving}>
-          {saving
-            ? "Saving..."
-            : editing
-            ? "Update note"
-            : "Save note"}
+      <div className="flex gap-2">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          onClick={onSave}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : editing ? "Update note" : "Save note"}
         </button>
-
         {editing && (
-          <button className="ghost" onClick={onCancel}>
+          <button
+            className="text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100"
+            onClick={onCancel}
+          >
             Cancel
           </button>
         )}

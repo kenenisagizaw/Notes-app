@@ -19,10 +19,10 @@ export default function App() {
 
   return (
     <div className="page">
-      <header className="header">
+      <header className="flex items-center justify-between mb-6">
         <div>
-          <p className="eyebrow">Notes</p>
-          <h1>Personal Notes</h1>
+          <p className="text-sm uppercase tracking-wide text-gray-500">Notes</p>
+          <h1 className="text-3xl font-bold">Personal Notes</h1>
         </div>
       </header>
 
@@ -39,11 +39,11 @@ export default function App() {
 
       <section className="notes">
         {loading ? (
-          <p className="muted">Loading notes...</p>
+          <p className="muted text-center mt-6">Loading notes...</p>
         ) : notes.length === 0 ? (
-          <p className="muted">No notes yet.</p>
+          <p className="muted text-center mt-6">No notes yet. Add your first note above.</p>
         ) : (
-          <div className="grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {notes.map((note) => (
               <NoteCard
                 key={note.id}
