@@ -7,7 +7,6 @@ import {
   Note,
   Draft,
 } from "../api/notes";
-//prepare hook
 
 const emptyDraft: Draft = { title: "", content: "" };
 
