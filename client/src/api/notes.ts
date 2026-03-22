@@ -14,6 +14,7 @@ export type Draft = {
   content: string;
 };
 
+// Fetch all notes.
 export async function getNotes(): Promise<Note[]> {
   const res = await fetch(`${API_BASE}/notes`);
   if (!res.ok) throw new Error("Failed to fetch notes");
