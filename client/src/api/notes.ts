@@ -20,7 +20,7 @@ export async function getNotes(): Promise<Note[]> {
   return res.json();
 }
 
-// Create a new note from a draft.
+
 export async function createNote(draft: Draft): Promise<Note> {
   const res = await fetch(`${API_BASE}/notes`, {
     method: "POST",
