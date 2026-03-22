@@ -31,7 +31,6 @@ export async function createNote(draft: Draft): Promise<Note> {
   return res.json();
 }
 
-// Update an existing note by id.
 export async function updateNote(
   id: string,
   draft: Draft
