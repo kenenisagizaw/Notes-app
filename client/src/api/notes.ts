@@ -44,6 +44,7 @@ export async function updateNote(
   return res.json();
 }
 
+// Delete a note by id.
 export async function deleteNote(id: string): Promise<void> {
   const res = await fetch(`${API_BASE}/notes/${id}`, {
     method: "DELETE",
