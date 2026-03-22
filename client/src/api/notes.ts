@@ -1,3 +1,4 @@
+// Base URL for the notes API, configured via Vite env.
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export type Note = {
@@ -13,12 +14,14 @@ export type Draft = {
   content: string;
 };
 
+// Fetch all notes.
 export async function getNotes(): Promise<Note[]> {
   const res = await fetch(`${API_BASE}/notes`);
   if (!res.ok) throw new Error("Failed to fetch notes");
   return res.json();
 }
 
+// Create a new note from a draft.
 export async function createNote(draft: Draft): Promise<Note> {
   const res = await fetch(`${API_BASE}/notes`, {
     method: "POST",
@@ -29,6 +32,7 @@ export async function createNote(draft: Draft): Promise<Note> {
   return res.json();
 }
 
+// Update an existing note by id.
 export async function updateNote(
   id: string,
   draft: Draft
@@ -42,6 +46,7 @@ export async function updateNote(
   return res.json();
 }
 
+// Delete a note by id.
 export async function deleteNote(id: string): Promise<void> {
   const res = await fetch(`${API_BASE}/notes/${id}`, {
     method: "DELETE",
